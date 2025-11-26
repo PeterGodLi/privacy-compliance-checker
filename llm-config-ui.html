@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM配置 - 隐私合规分析工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .llm-config-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .config-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-group .help-text {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .provider-info {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        
+        .provider-info h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .provider-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .provider-info li {
+            margin: 5px 0;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .status-indicator.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-indicator.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-indicator.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .test-result pre {
+            margin: 10px 0 0 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .back-link:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="llm-config-container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            返回主页
+        </a>
+        
+        <div class="config-section">
+            <h2>
+                <i class="fas fa-robot"></i>
+                大模型（LLM）配置
+            </h2>
+            
+            <p>配置大模型API以获得更精准的隐私条款和权限分析。如果不配置，系统将使用基于规则的引擎进行分析。</p>
+            
+            <form id="llmConfigForm">
+                <div class="form-group">
+                    <label for="provider">
+                        <i class="fas fa-server"></i>
+                        LLM提供商
+                    </label>
+                    <select id="provider" name="provider">
+                        <option value="none">不使用（仅规则引擎）</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="azure">Azure OpenAI</option>
+                        <option value="zhipu">智谱AI（GLM）</option>
+                    </select>
+                    <div class="help-text">选择您要使用的大模型服务提供商</div>
+                </div>
+                
+                <div id="providerInfo"></div>
+                
+                <div class="form-group" id="apiKeyGroup" style="display: none;">
+                    <label for="apiKey">
+                        <i class="fas fa-key"></i>
+                        API密钥
+                    </label>
+                    <input type="password" id="apiKey" name="apiKey" placeholder="请输入您的API密钥">
+                    <div class="help-text">您的API密钥将被安全地存储在浏览器本地存储中</div>
+                </div>
+                
+                <div class="form-group" id="apiEndpointGroup" style="display: none;">
+                    <label for="apiEndpoint">
+                        <i class="fas fa-link"></i>
+                        API端点（可选）
+                    </label>
+                    <input type="text" id="apiEndpoint" name="apiEndpoint" placeholder="留空使用默认端点">
+                    <div class="help-text">如需使用自定义端点或代理，请在此输入</div>
+                </div>
+                
+                <div class="form-group" id="modelGroup" style="display: none;">
+                    <label for="model">
+                        <i class="fas fa-brain"></i>
+                        模型名称
+                    </label>
+                    <input type="text" id="model" name="model" placeholder="gpt-4">
+                    <div class="help-text">要使用的模型名称（如 gpt-4, gpt-3.5-turbo, glm-4等）</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存配置
+                    </button>
+                    <button type="button" id="testBtn" class="btn btn-success" style="display: none;">
+                        <i class="fas fa-vial"></i>
+                        测试连接
+                    </button>
+                    <button type="button" id="clearBtn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                        清除配置
+                    </button>
+                </div>
+            </form>
+            
+            <div id="testResult" class="test-result" style="display: none;"></div>
+        </div>
+        
+        <div class="config-section">
+            <h2>
+                <i class="fas fa-info-circle"></i>
+                使用说明
+            </h2>
+            
+            <h3>为什么使用大模型？</h3>
+            <p>大模型能够：</p>
+            <ul>
+                <li>更准确地理解隐私条款中的复杂表述</li>
+                <li>识别隐含的信息收集行为</li>
+                <li>提供更详细的分析和建议</li>
+                <li>适应各种文档格式和表达方式</li>
+            </ul>
+            
+            <h3>支持的提供商</h3>
+            
+            <h4><i class="fab fa-openai"></i> OpenAI</h4>
+            <ul>
+                <li>注册地址: <a href="https://platform.openai.com/" target="_blank">https://platform.openai.com/</a></li>
+                <li>推荐模型: gpt-4, gpt-3.5-turbo</li>
+                <li>特点: 强大的理解能力，支持中文</li>
+            </ul>
+            
+            <h4><i class="fab fa-microsoft"></i> Azure OpenAI</h4>
+            <ul>
+                <li>注册地址: <a href="https://azure.microsoft.com/zh-cn/products/ai-services/openai-service" target="_blank">Azure OpenAI Service</a></li>
+                <li>推荐模型: gpt-4, gpt-35-turbo</li>
+                <li>特点: 企业级服务，数据安全，需要Azure订阅</li>
+            </ul>
+            
+            <h4><i class="fas fa-robot"></i> 智谱AI</h4>
+            <ul>
+                <li>注册地址: <a href="https://open.bigmodel.cn/" target="_blank">https://open.bigmodel.cn/</a></li>
+                <li>推荐模型: glm-4, glm-3-turbo</li>
+                <li>特点: 国产大模型，中文理解出色，价格实惠</li>
+            </ul>
+            
+            <h3>隐私与安全</h3>
+            <ul>
+                <li>API密钥仅存储在您的浏览器本地，不会上传到任何服务器</li>
+                <li>所有分析请求直接从您的浏览器发送到对应的LLM服务商</li>
+                <li>我们不会记录、存储或访问您的任何数据</li>
+                <li>建议定期更换API密钥以确保安全</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="llm-analyzer.js"></script>
+    <script>
+        const configManager = new LLMConfigManager();
+        let currentProvider = 'none';
+        
+        // 加载保存的配置
+        document.addEventListener('DOMContentLoaded', () => {
+            const config = configManager.getConfig();
+            document.getElementById('provider').value = config.provider || 'none';
+            document.getElementById('apiKey').value = config.apiKey || '';
+            document.getElementById('apiEndpoint').value = config.apiEndpoint || '';
+            document.getElementById('model').value = config.model || 'gpt-4';
+            
+            currentProvider = config.provider || 'none';
+            updateProviderFields();
+            updateProviderInfo();
+        });
+        
+        // 提供商选择变化
+        document.getElementById('provider').addEventListener('change', (e) => {
+            currentProvider = e.target.value;
+            updateProviderFields();
+            updateProviderInfo();
+        });
+        
+        // 更新提供商相关字段显示
+        function updateProviderFields() {
+            const showFields = currentProvider !== 'none';
+            document.getElementById('apiKeyGroup').style.display = showFields ? 'block' : 'none';
+            document.getElementById('apiEndpointGroup').style.display = showFields ? 'block' : 'none';
+            document.getElementById('modelGroup').style.display = showFields ? 'block' : 'none';
+            document.getElementById('testBtn').style.display = showFields ? 'inline-flex' : 'none';
+            
+            // 根据提供商设置默认模型
+            const modelInput = document.getElementById('model');
+            if (currentProvider === 'openai') {
+                modelInput.placeholder = 'gpt-4';
+            } else if (currentProvider === 'azure') {
+                modelInput.placeholder = 'gpt-4';
+            } else if (currentProvider === 'zhipu') {
+                modelInput.placeholder = 'glm-4';
+            }
+        }
+        
+        // 更新提供商信息
+        function updateProviderInfo() {
+            const infoDiv = document.getElementById('providerInfo');
+            
+            const providerInfos = {
+                openai: {
+                    title: 'OpenAI配置说明',
+                    icon: 'fab fa-openai',
+                    color: '#10a37f',
+                    items: [
+                        '前往 <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a> 获取API密钥',
+                        '推荐模型: gpt-4, gpt-3.5-turbo',
+                        '定价信息: <a href="https://openai.com/pricing" target="_blank">查看价格</a>'
+                    ]
+                },
+                azure: {
+                    title: 'Azure OpenAI配置说明',
+                    icon: 'fab fa-microsoft',
+                    color: '#0078d4',
+                    items: [
+                        '需要Azure订阅并创建OpenAI资源',
+                        'API端点格式: https://YOUR_RESOURCE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_NAME/chat/completions?api-version=2024-02-15-preview',
+                        '模型需要先在Azure门户中部署'
+                    ]
+                },
+                zhipu: {
+                    title: '智谱AI配置说明',
+                    icon: 'fas fa-robot',
+                    color: '#5b8ff9',
+                    items: [
+                        '前往 <a href="https://open.bigmodel.cn/" target="_blank">智谱AI开放平台</a> 注册并获取API Key',
+                        '推荐模型: glm-4, glm-3-turbo',
+                        '支持国内访问，无需代理'
+                    ]
+                }
+            };
+            
+            if (currentProvider === 'none') {
+                infoDiv.innerHTML = '';
+                return;
+            }
+            
+            const info = providerInfos[currentProvider];
+            if (info) {
+                infoDiv.innerHTML = `
+                    <div class="provider-info" style="border-left-color: ${info.color}">
+                        <h4><i class="${info.icon}"></i> ${info.title}</h4>
+                        <ul>
+                            ${info.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        // 保存配置
+        document.getElementById('llmConfigForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const config = {
+                provider: document.getElementById('provider').value,
+                apiKey: document.getElementById('apiKey').value.trim(),
+                apiEndpoint: document.getElementById('apiEndpoint').value.trim(),
+                model: document.getElementById('model').value.trim() || 'gpt-4',
+                temperature: 0.3,
+                maxTokens: 2000
+            };
+            
+            if (configManager.saveConfig(config)) {
+                showNotification('配置保存成功！', 'success');
+            } else {
+                showNotification('配置保存失败，请重试', 'error');
+            }
+        });
+        
+        // 测试连接
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const testBtn = document.getElementById('testBtn');
+            const testResult = document.getElementById('testResult');
+            
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 测试中...';
+            
+            const config = {
+                provider: document.getElementById('provider').value,
+                apiKey: document.getElementById('apiKey').value.trim(),
+                apiEndpoint: document.getElementById('apiEndpoint').value.trim(),
+                model: document.getElementById('model').value.trim() || 'gpt-4'
+            };
+            
+            const analyzer = new LLMPrivacyAnalyzer(config);
+            const result = await analyzer.testConnection();
+            
+            testResult.style.display = 'block';
+            
+            if (result.success) {
+                testResult.innerHTML = `
+                    <div class="status-indicator success">
+                        <i class="fas fa-check-circle"></i>
+                        连接测试成功
+                    </div>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+            } else {
+                testResult.innerHTML = `
+                    <div class="status-indicator error">
+                        <i class="fas fa-times-circle"></i>
+                        连接测试失败
+                    </div>
+                    <p>${result.message}</p>
+                    ${result.error ? `<pre>${result.error.message}</pre>` : ''}
+                `;
+            }
+            
+            testBtn.disabled = false;
+            testBtn.innerHTML = '<i class="fas fa-vial"></i> 测试连接';
+        });
+        
+        // 清除配置
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (confirm('确定要清除所有配置吗？此操作不可恢复。')) {
+                if (configManager.clearConfig()) {
+                    document.getElementById('provider').value = 'none';
+                    document.getElementById('apiKey').value = '';
+                    document.getElementById('apiEndpoint').value = '';
+                    document.getElementById('model').value = 'gpt-4';
+                    currentProvider = 'none';
+                    updateProviderFields();
+                    updateProviderInfo();
+                    document.getElementById('testResult').style.display = 'none';
+                    showNotification('配置已清除', 'success');
+                } else {
+                    showNotification('清除配置失败', 'error');
+                }
+            }
+        });
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `status-indicator ${type}`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.animation = 'slideInRight 0.3s ease';
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            notification.innerHTML = `
+                <i class="fas ${icons[type] || icons.info}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

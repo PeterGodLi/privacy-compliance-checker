@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多平台应用隐私合规检查</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>多平台应用隐私合规检查</h1>
+            <div class="header-actions">
+                <a href="llm-config-ui.html" class="btn-config" title="配置大模型API">
+                    <i class="fas fa-robot"></i>
+                    <span>LLM配置</span>
+                </a>
+                <div class="llm-status" id="llmStatus">
+                    <i class="fas fa-circle"></i>
+                    <span id="llmStatusText">未配置</span>
+                </div>
+            </div>
+            <p class="header-time" id="currentTime">2025/11/25 17:24:49</p>
+        </header>
+
+        <!-- 工具介绍卡片 -->
+        <div class="intro-card">
+            <div class="intro-header">
+                <i class="fas fa-heart"></i>
+                <h2>全平台隐私合规检查工具</h2>
+            </div>
+            <p class="intro-description">
+                支持 iOS、macOS、Android、Windows 四大平台的应用隐私合规检测。自动对比隐私条款与配置文件，快速发现合规风险。
+            </p>
+                    <div class="platform-badges">
+                        <button class="badge ios" data-platform="ios" onclick="selectPlatform('ios')">
+                            <i class="fab fa-apple"></i> iOS/iPadOS
+                        </button>
+                        <button class="badge macos" data-platform="macos" onclick="selectPlatform('macos')">
+                            <i class="fab fa-apple"></i> macOS
+                        </button>
+                        <button class="badge android" data-platform="android" onclick="selectPlatform('android')">
+                            <i class="fab fa-android"></i> Android
+                        </button>
+                        <button class="badge windows" data-platform="windows" onclick="selectPlatform('windows')">
+                            <i class="fab fa-windows"></i> Windows
+                        </button>
+                        <button class="badge harmonyos" data-platform="harmonyos" onclick="selectPlatform('harmonyos')">
+                            <i class="fas fa-mobile-alt"></i> 鸿蒙OS
+                        </button>
+                        <button class="badge all active" data-platform="all" onclick="selectPlatform('all')">
+                            <i class="fas fa-globe"></i> 全部平台
+                        </button>
+                    </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 应用信息输入 -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-plus"></i>
+                    <h3>应用信息输入</h3>
+                </div>
+
+                <!-- 平台选择 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-mobile-alt"></i>
+                        选择平台
+                    </label>
+                    <div class="platform-selector">
+                        <select id="platformSelect" class="form-select">
+                            <option value="all">全部平台 (iOS + macOS + Android + Windows + 鸿蒙OS)</option>
+                            <option value="ios">iOS/iPadOS</option>
+                            <option value="macos">macOS</option>
+                            <option value="android">Android</option>
+                            <option value="windows">Windows</option>
+                            <option value="harmonyos">鸿蒙OS</option>
+                        </select>
+                    </div>
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i>
+                        提示：选择平台后，应用列表将自动调整显示对应平台的应用，支持iOS、macOS、Android、Windows、鸿蒙OS五大平台的隐私合规检测。
+                    </div>
+                </div>
+
+                <!-- 应用名称 -->
+                <div class="form-group">
+                    <label class="form-label">应用名称</label>
+                    <input type="text" id="appName" class="form-input" placeholder="例如：微信、抖音、Safari等">
+                </div>
+
+                <!-- 本地应用选择 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-desktop"></i>
+                        本地已安装应用
+                    </label>
+                    <div class="app-selection-container">
+                        <select id="localAppSelect" class="form-select">
+                            <option value="">-- 先扫描本地应用 --</option>
+                        </select>
+                        <button type="button" class="btn btn-primary" id="scanLocalAppsBtn">
+                            <i class="fas fa-search"></i>
+                            扫描本地应用
+                        </button>
+                        <button type="button" class="btn btn-success" id="autoGetConfigBtn" style="display: none;">
+                            <i class="fas fa-download"></i>
+                            获取配置文件
+                        </button>
+                    </div>
+                    <!-- 扫描进度条 -->
+                    <div id="scanProgress" class="scan-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div id="scanProgressBar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="scanProgressText" class="progress-text">准备扫描...</div>
+                    </div>
+                    <div class="app-count">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="localAppCount" style="display: none;">
+                            本地检测到 <span id="localCount">0</span> 个应用
+                        </span>
+                        <span id="noLocalApps">点击"扫描本地应用"开始检测</span>
+                    </div>
+                </div>
+
+                <!-- 预置应用选择 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-list"></i>
+                        或从预置应用列表选择
+                    </label>
+                    <select id="presetAppSelect" class="form-select">
+                        <option value="">-- 选择预置应用 --</option>
+                    </select>
+                    <div class="app-count">
+                        <i class="fas fa-info-circle"></i>
+                        已加载 <span id="presetAppCount">97</span> 个预置应用
+                    </div>
+                </div>
+
+                <!-- 隐私条款URL -->
+                <div class="form-group">
+                    <label class="form-label">隐私条款URL（可选）</label>
+                    <input type="url" id="privacyUrl" class="form-input" placeholder="输入隐私条款链接">
+                </div>
+            </div>
+
+            <!-- 上传配置文件 -->
+            <div class="section">
+                <!-- 第一行：标题 -->
+                <div class="section-header">
+                    <i class="fas fa-upload"></i>
+                    <h3>上传配置文件</h3>
+                </div>
+
+                <!-- 第二行：选择文件按钮 -->
+                <div class="upload-button-row">
+                    <button class="btn btn-primary btn-large" id="selectFileBtn">
+                        <i class="fas fa-file-upload"></i>
+                        选择文件
+                    </button>
+                    <input type="file" id="fileInput" multiple accept=".plist,.xml,.json" style="display: none;">
+                </div>
+
+                <!-- 第三行：提示框内容 -->
+                <div class="upload-info">
+                    <div class="info-header">
+                        <i class="fas fa-lightbulb"></i>
+                        智能提示：
+                    </div>
+                    <ol class="info-list">
+                        <li>选择应用后，系统将自动填充隐私条款URL（如有）</li>
+                        <li>支持上传不同平台的配置文件：
+                            <ul class="platform-files">
+                                <li><i class="fab fa-apple"></i> iOS/macOS: Info.plist</li>
+                                <li><i class="fab fa-android"></i> Android: AndroidManifest.xml</li>
+                                <li><i class="fab fa-windows"></i> Windows: AppxManifest.xml</li>
+                                <li><i class="fas fa-mobile-alt"></i> 鸿蒙OS: config.json</li>
+                            </ul>
+                        </li>
+                        <li>可以手动上传配置文件，支持拖拽上传</li>
+                    </ol>
+                </div>
+
+                <div class="file-list" id="fileList">
+                    <!-- 上传的文件将显示在这里 -->
+                </div>
+            </div>
+
+            <!-- 分析按钮 -->
+            <div class="action-section">
+                <button class="btn btn-analyze" id="analyzeBtn">
+                    <i class="fas fa-search"></i>
+                    开始分析
+                </button>
+                <button class="btn btn-success" id="quickTestBtn" onclick="runQuickTest()">
+                    <i class="fas fa-bolt"></i>
+                    快速测试
+                </button>
+                <button class="btn btn-reset" id="resetBtn">
+                    <i class="fas fa-redo"></i>
+                    重置
+                </button>
+            </div>
+        </div>
+        </div>
+
+        <!-- 用户信息收集清单 -->
+        <div class="info-collection-section" id="infoCollectionSection" style="display: none;">
+            <div class="section-header">
+                <i class="fas fa-user-shield"></i>
+                <h3>用户信息收集清单</h3>
+            </div>
+            <div id="infoCollectionResults">
+                <!-- 信息收集清单将显示在这里 -->
+            </div>
+        </div>
+
+        <!-- 结果展示区域 -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="section-header">
+                <i class="fas fa-chart-line"></i>
+                <h3>隐私合规分析结果</h3>
+            </div>
+            <div id="analysisResults">
+                <!-- 分析结果将显示在这里 -->
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>正在分析中，请稍候...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="parser.js"></script>
+    <script src="parser-enhanced.js"></script>
+    <script src="app-detector-enhanced.js"></script>
+    <script src="info-collector.js"></script>
+    <script src="llm-analyzer.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

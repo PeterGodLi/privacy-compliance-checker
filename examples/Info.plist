@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>示例应用</string>
+    <key>CFBundleName</key>
+    <string>ExampleApp</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.example.app</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    
+    <!-- 权限声明 -->
+    <key>NSCameraUsageDescription</key>
+    <string>此应用需要访问相机以拍摄照片和录制视频</string>
+    
+    <key>NSMicrophoneUsageDescription</key>
+    <string>此应用需要访问麦克风以录制音频</string>
+    
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>此应用需要访问您的位置信息以提供基于位置的服务</string>
+    
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>此应用需要访问相册以选择和保存照片</string>
+    
+    <key>NSContactsUsageDescription</key>
+    <string>此应用需要访问通讯录以便您与朋友分享内容</string>
+    
+    <key>NSCalendarsUsageDescription</key>
+    <string>此应用需要访问日历以创建和管理事件</string>
+    
+    <key>NSFaceIDUsageDescription</key>
+    <string>此应用使用Face ID进行身份验证</string>
+    
+    <key>NSMotionUsageDescription</key>
+    <string>此应用需要访问运动数据以跟踪您的活动</string>
+</dict>
+</plist>
